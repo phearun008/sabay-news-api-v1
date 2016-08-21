@@ -1,5 +1,6 @@
 package com.news.sabay.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,13 @@ public class SabayApi {
 		data.add("term_name", "cat");
 		data.add("paged", page);
 		HttpEntity<Object> requestEntity = new HttpEntity<>(data, headers);
-
+		
 		ResponseEntity<String> newsResponse = restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, String.class);
+		
+		if(newsResponse.getBody().contains("No more post to show !"))
+			return new ResponseEntity<List<News>>(new ArrayList<News>(), HttpStatus.OK);
+		
+		System.err.println(newsResponse.getBody());
 		
 		TypeToken<List<News>> token = new TypeToken<List<News>>(){};
 		List<News> news = new Gson().fromJson(newsResponse.getBody(), token.getType());
